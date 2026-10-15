@@ -1,5 +1,7 @@
+import base64
 import calendar
 from datetime import date
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
@@ -9,15 +11,21 @@ from content import CATEGORIES, SIGNS
 from engine import MONTHS_ES, ExhaustedError, generate_month
 from exporter import build_xlsx, filename
 
-st.set_page_config(page_title="Horóscopo Mensual", page_icon="✨", layout="wide")
+LOGO = Path(__file__).parent / "assets" / "logo.jpg"
+LOGO_B64 = base64.b64encode(LOGO.read_bytes()).decode()
+
+st.set_page_config(page_title="Horóscopo Mensual", page_icon=str(LOGO), layout="wide")
 
 st.markdown(
     """
 <style>
 .block-container {max-width: 1200px; padding-top: 2rem;}
-.hero {background: linear-gradient(135deg,#3b2a78 0%,#6b3fa0 55%,#c9a2ff 100%);
+.hero {display:flex; align-items:center; gap:1.5rem; background: linear-gradient(135deg,#3b2a78 0%,#6b3fa0 55%,#c9a2ff 100%);
   border-radius: 20px; padding: 2rem 2.2rem; margin-bottom: 1.5rem;
   box-shadow: 0 10px 30px rgba(107,63,160,.35);}
+.hero img {height:96px; border-radius:18px; box-shadow:0 4px 14px rgba(0,0,0,.3);}
+.by {color:#fff; opacity:.85; font-style:italic; letter-spacing:.04em;}
+.footer {text-align:center; color:#a99bd6; margin:2.5rem 0 1rem; font-size:.9rem;}
 .hero h1 {margin:0; color:#fff; font-size: 2.2rem;}
 .hero p {margin:.3rem 0 0; color:#efe6ff; font-size:1.05rem;}
 .card {background:#1a1433; border:1px solid #2e2457; border-radius:16px;
@@ -29,9 +37,10 @@ st.markdown(
 .meta {color:#a99bd6; font-size:.88rem;}
 div.stButton > button, div.stDownloadButton > button {border-radius:12px; font-weight:600;}
 </style>
-<div class="hero"><h1>✨ Horóscopo Mensual</h1>
-<p>Genera, versiona y publica pronósticos únicos para los 12 signos, todos los días del mes.</p></div>
-""",
+<div class="hero"><img src="data:image/jpeg;base64,__LOGO__" alt="logo">
+<div><h1>Horóscopo Mensual</h1><div class="by">By nosotros</div>
+<p>Genera, versiona y publica pronósticos únicos para los 12 signos, todos los días del mes.</p></div></div>
+""".replace("__LOGO__", LOGO_B64),
     unsafe_allow_html=True,
 )
 
@@ -125,3 +134,5 @@ with tab_view:
         df.index = [date.fromisoformat(d).strftime("%d/%m/%Y") for d in df.index]
         df.index.name = "Fecha"
         st.dataframe(df, width="stretch", height=600)
+
+st.markdown("<div class='footer'>Horóscopo Mensual · By nosotros</div>", unsafe_allow_html=True)
