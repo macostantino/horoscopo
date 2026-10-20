@@ -21,33 +21,75 @@ S1_LEADS = [
     "Hoy", "Desde temprano", "Durante esta jornada", "A lo largo del día",
     "En las próximas horas", "Al comenzar la jornada", "Hacia el mediodía",
     "Con el correr de las horas", "En este día", "Por la mañana",
+    "Desde las primeras horas", "Al despertar", "Antes del mediodía", "Pasado el mediodía",
+    "Entrada la tarde", "Durante la mañana", "En el transcurso de la tarde", "Al iniciar el día",
+    "En las horas centrales del día", "En esta jornada", "Este día", "En la primera mitad del día",
+    "Con la llegada de la mañana", "Con la luz del día", "Mientras avanza la jornada",
+    "Según avanza el día", "Al salir el sol", "Ya desde el amanecer", "Durante buena parte del día",
+    "En los próximos momentos", "De ahora en adelante", "En este preciso momento",
+    "Con las primeras tareas del día", "Al empezar tus actividades", "Entre una tarea y otra",
+    "En medio del ajetreo del día", "En el ritmo cotidiano", "Justo hoy", "Al caer la mañana",
+    "En el curso del día",
 ]
-S1_VERBS = ["te invita a", "te ayuda a", "te impulsa a", "te anima a", "te prepara para", "te da fuerza para"]
+S1_VERBS = [
+    "te invita a", "te ayuda a", "te impulsa a", "te anima a", "te prepara para", "te da fuerza para",
+    "te motiva a", "te alienta a", "te inspira a", "te permite", "te empuja a", "te propone",
+]
 
 S2_FORMS = ["tendrás que", "será necesario", "te tocará", "habrá que", "conviene", "deberás"]
 S2_PREFIXES = [
     "", "En algún momento, ", "Por la tarde, ", "Más de una vez, ", "Aunque cueste, ",
     "Si hace falta, ", "Llegado el caso, ", "Durante el día, ", "Más allá del cansancio, ", "Aunque dudes, ",
+    "Por momentos, ", "A ratos, ", "Hacia la noche, ", "Antes de terminar el día, ", "A media jornada, ",
+    "En algún tramo del día, ", "Con el correr de las horas, ", "Aunque no lo parezca, ",
+    "Aunque te cueste admitirlo, ", "Más allá de las dudas, ", "Si la ocasión lo pide, ",
+    "Cuando sea necesario, ", "Si el momento lo exige, ", "En un momento clave, ", "Desde la mañana, ",
+    "Pese al ritmo del día, ", "A pesar de la prisa, ", "Aun si surge el cansancio, ",
+    "En ciertos momentos, ", "Si surge la oportunidad, ",
 ]
 S2_TAILS = [
     "", " antes de seguir adelante", " aunque cueste al principio", " sin perder la calma",
     " aunque el camino sea lento", " sin rendirte a mitad de camino", " aunque no sea sencillo",
     " dando un paso a la vez", " con humildad y firmeza", " sin apresurarte",
     " y confiar en el proceso", " pensando en lo que viene",
+    " aunque lleve más tiempo del previsto", " sin perder de vista tu meta",
+    " con la mirada puesta en lo que quieres", " confiando en tu criterio", " sin dejar de cuidarte",
+    " paso a paso", " con perseverancia", " sin olvidar lo que ya lograste",
+    " teniendo presente lo que importa", " para que todo encaje", " y dejar que el tiempo haga lo suyo",
+    " con serenidad", " aunque nadie lo note", " con la certeza de que vale la pena",
+    " sin miedo a equivocarte", " con la mente despejada", " sin caer en la prisa",
+    " aprovechando lo aprendido", " con la ayuda que tengas a mano",
 ]
 
 S3_TIMES = [
     "Al final", "Finalmente", "Con el paso de las horas", "Hacia el atardecer",
     "Antes de que termine el día", "Más pronto de lo que crees", "Cuando menos lo esperes",
     "Poco a poco", "Al caer la tarde", "Tras el esfuerzo",
+    "Al terminar la jornada", "Cuando caiga la noche", "Antes de irte a dormir", "Hacia la noche",
+    "Cuando el día llegue a su fin", "Con el atardecer", "Al cierre de la jornada",
+    "En cuanto pase la tormenta", "Sin que lo notes", "Más adelante", "En poco tiempo", "Muy pronto",
+    "En breve", "Con el tiempo", "Cuando todo se acomode", "Una vez superado el obstáculo",
+    "Pasado el momento difícil", "Cuando la calma regrese", "Al mirar atrás", "En los días que siguen",
+    "Tarde o temprano", "Con cada paso", "Después de la prueba", "Al despejarse el panorama",
+    "Cuando menos lo imagines", "A medida que avanza el día", "En el momento justo", "Al caer la noche",
+    "Con la última luz del día", "Antes de lo previsto",
 ]
-S3_VERBS = ["te regala", "te trae", "te deja", "se convierte en", "da paso a", "te acerca a"]
+S3_VERBS = [
+    "te regala", "te trae", "te deja", "se convierte en", "da paso a", "te acerca a",
+    "te concede", "te ofrece", "te entrega", "se transforma en", "conduce a", "te abre paso a",
+]
 
-S4_VERBS = ["Cuida", "Valora", "Celebra", "Agradece", "Aprovecha", "Honra", "Disfruta", "Protege", "Reconoce"]
+S4_VERBS = [
+    "Cuida", "Valora", "Celebra", "Agradece", "Aprovecha", "Honra", "Disfruta", "Protege", "Reconoce",
+    "Cultiva", "Mantén", "Abraza", "Atesora", "Respeta",
+]
 S4_TAILS = [
     "", " hoy mismo", " con calma", " sin culpa", " con gratitud", " de corazón",
     " a tu manera", " sin prisa", " cada vez que puedas", " durante todo el día",
     " con todo tu ser", " en cada momento",
+    " cuando lo necesites", " antes de dormir", " con cariño", " sin condiciones", " sin compararte",
+    " desde ahora", " a cada paso", " como un regalo", " esta semana", " y verás los frutos",
+    " con alegría", " a lo largo del mes",
 ]
 
 # ---- Piezas por categoría -------------------------------------------------
@@ -306,7 +348,12 @@ CONTENT = {
 }
 
 # ---- Cierres propios de cada signo ---------------------------------------
-SIGN_LEADS = ["Hoy", "Hoy más que nunca", "Esta vez", "Ahora", "En este momento", "Sin duda", "Como siempre", "Una vez más"]
+SIGN_LEADS = [
+    "Hoy", "Hoy más que nunca", "Esta vez", "Ahora", "En este momento", "Sin duda", "Como siempre", "Una vez más",
+    "En esta etapa", "Desde ya", "A partir de hoy", "En estos días", "Por fortuna", "Esta vez también",
+    "Hoy mismo", "Siempre", "De seguro", "Claramente", "Cada día más", "Desde siempre",
+    "En esta jornada", "Por suerte", "Esta semana", "Con el correr del día",
+]
 SIGN_PREDICATES = [
     "abre caminos donde otros dudan", "marca la diferencia", "inspira a quienes te rodean",
     "ilumina cada paso que das", "te lleva más lejos de lo que imaginas", "te acompaña como una fuerza silenciosa",
@@ -314,6 +361,13 @@ SIGN_PREDICATES = [
     "transforma los obstáculos en oportunidades", "te regala confianza", "despierta lo mejor de ti",
     "siembra buenos resultados", "te sostiene cuando todo se mueve", "hace brillar lo que tocas",
     "te abre puertas inesperadas", "convierte lo difícil en aprendizaje", "trae calma a quienes te rodean",
+    "te impulsa a seguir adelante", "alegra a quienes te rodean", "da frutos a su tiempo",
+    "te da el empuje que necesitas", "te ayuda a ver lo mejor de cada situación", "nunca te abandona",
+    "te devuelve la sonrisa", "te muestra el camino", "enciende tu confianza", "fortalece tus decisiones",
+    "te hace avanzar con firmeza", "crece con cada paso", "te protege de los malos momentos",
+    "amplía tus horizontes", "dice más de ti que mil palabras", "te da razones para sonreír",
+    "transforma tu día", "hace que todo fluya mejor", "te recuerda lo valioso que eres",
+    "trae buenos augurios", "construye puentes con los demás", "te da la calma que necesitas",
 ]
 SIGN_SUBJECTS = {
     "ARIES": ["tu espíritu de Aries", "tu iniciativa ariana", "tu determinación", "tu energía pionera",
