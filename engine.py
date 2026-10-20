@@ -102,7 +102,7 @@ def _build_a(rng, cat, heads):
     c = CONTENT[cat]
     sit, eff = c["sit"][heads[0]], c["eff"][heads[1]]
     form = rng.choice(A_FORMS)
-    tail = rng.choice(A_TAILS) if rng.random() < 0.25 else ""
+    tail = rng.choice(A_TAILS) if rng.random() < 0.15 else ""
     if tail.startswith(" aunque") and "aunque" in eff:
         tail = ""
     lead = rng.choice(A_LEADS) if rng.random() < 0.5 else ""
@@ -124,14 +124,18 @@ def _build_a(rng, cat, heads):
     return _cap(s) + "."
 
 
-def _pick_tail(rng, tails, p=0.45):
+def _pick_tail(rng, tails, p=0.35):
     return rng.choice(tails) if rng.random() < p else ""
 
 
 def _build_b(rng, cat, heads):
     # La segunda oración a veces va sin conector, para que no todas arranquen igual.
     conn = rng.choice(B_CONNECTORS) if rng.random() < 0.7 else ""
-    return _cap(f"{conn}{CONTENT[cat]['light'][heads[0]]}{_pick_tail(rng, B_TAILS)}") + "."
+    light = CONTENT[cat]["light"][heads[0]]
+    tail = _pick_tail(rng, B_TAILS)
+    if _stems(light) & _stems(tail) or _stems(conn) & _stems(light):  # sin repetir ideas ("ánimo… ánimo")
+        tail = ""
+    return _cap(f"{conn}{light}{tail}") + "."
 
 
 def _build_astro(rng, cat, heads):

@@ -21,8 +21,10 @@ A_FORMS = [
     "tendrás que", "será necesario", "te tocará", "habrá que", "conviene", "deberás",
     "hará falta", "lo mejor será", "vas a tener que", "te conviene",
     "lo ideal será", "harás bien en", "necesitarás", "es momento de", "toca", "no está de más",
+    "hay que", "te aconsejo", "te recomiendo", "sería bueno", "sería prudente", "procura", "intenta",
+    "no olvides", "vale la pena", "te vendrá bien", "es buen momento para", "haz el esfuerzo de",
 ]
-A_TAILS = [" antes de seguir adelante", " paso a paso", " con serenidad", " aunque cueste al principio"]
+A_TAILS = [" antes de seguir adelante", " paso a paso", " con serenidad", " aunque cueste al principio"]  # pocas y neutras
 B_CONNECTORS = [
     "Pero ", "Aun así, ", "La buena noticia es que ", "Hacia el final del día ", "Más pronto que tarde ",
     "Poco a poco ", "Si te mantienes firme, ", "Al final ", "Antes de lo que piensas ",
@@ -36,8 +38,10 @@ B_CONNECTORS = [
 B_TAILS = [
     ", justo cuando más lo necesitas", ", y se nota en tu ánimo", ", y eso te da nuevas fuerzas",
     ", y no es poca cosa", ", como un pequeño premio", ", y lo notarás enseguida", ", y vale cada esfuerzo",
-    ", y no te lo esperabas", ", lo cual te sienta de maravilla", ", y te lo agradecerás",
-    ", como si el día se pusiera de tu parte", ", que ya era hora",
+    ", y no te lo esperabas", ", y te lo agradecerás", ", y bien que lo necesitabas", ", y te devuelve el ánimo",
+    ", como quien recibe un buen regalo", ", y eso cambia el rumbo del día", ", algo que ya no esperabas",
+    ", y se siente muy bien", ", y te hacía falta", ", y ya era hora", ", como una pequeña victoria",
+    ", como si el día se pusiera de tu parte", 
 ]
 C_PLANETS = ["Venus", "Mercurio", "Marte", "Júpiter", "Saturno", "la Luna", "el Sol", "Neptuno"]
 C_LEADS = ["", "", "Hoy ", "Estos días ", "Esta jornada ", "Por estos días ", "Desde temprano ", "Esta vez "]
