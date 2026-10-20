@@ -1,10 +1,18 @@
 import base64
 import calendar
+import importlib
+import sys
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+
+# Streamlit Cloud puede conservar en memoria versiones viejas de los módulos locales tras un
+# despliegue. Se recargan en orden de dependencia para usar siempre el código más reciente.
+for _name in ("content", "engine", "exporter", "db", "review"):
+    if _name in sys.modules:
+        importlib.reload(sys.modules[_name])
 
 import db
 from content import CATEGORIES, SIGNS
