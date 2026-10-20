@@ -19,7 +19,7 @@ from content import CATEGORIES, CONTENT, SIGNS
 from engine import _redundant, generate_month, split_sentences
 from exporter import build_xlsx
 
-MAX_ATTEMPTS = 5
+MAX_ATTEMPTS = 12
 MAX_REPORTED = 8  # problemas que se detallan por pasada
 
 
@@ -105,24 +105,35 @@ def _rows_from_xlsx(data):
     return [dict(sign=a, category=b, text=c, day=d) for a, b, c, d in ws.iter_rows(min_row=2, values_only=True)]
 
 
-def generate_reviewed(year, month, history, seed=None):
+def generate_reviewed(year, month, history, seed=None, progress=None):
     """Genera el mes y lo entrega solo tras dos revisiones limpias.
 
-    Devuelve (entries, xlsx_bytes, report). report = {"attempts": n, "passes": [...], "rehechos": n}.
+    Devuelve (entries, xlsx_bytes, report). report = {"attempts": n, "passes": [...], "log": [...]}.
+    progress: función opcional progress(fracción 0-1, texto) para mostrar avance.
     """
     log = []
+
+    def step(frac, text):
+        if progress:
+            progress(frac, text)
+
     for attempt in range(1, MAX_ATTEMPTS + 1):
+        step(0.05, "Escribiendo los pronósticos…" if attempt == 1 else f"Corrigiendo y reintentando ({attempt})…")
         entries = generate_month(year, month, history, seed=None if seed is None else seed + attempt)
+        step(0.45, "Revisión 1 de 2…")
         p1 = audit_rows(_rows_from_entries(entries), year, month, history)
         log.append({"attempt": attempt, "pass": 1, "problems": p1[:MAX_REPORTED], "count": len(p1)})
         if p1:
             continue
+        step(0.7, "Armando el Excel…")
         data = build_xlsx(_rows_from_entries(entries))
+        step(0.85, "Revisión 2 de 2…")
         rows2 = _rows_from_xlsx(data)
         p2 = ["El Excel generado no tiene el formato esperado"] if rows2 is None else audit_rows(rows2, year, month, history)
         log.append({"attempt": attempt, "pass": 2, "problems": p2[:MAX_REPORTED], "count": len(p2)})
         if p2:
             continue
+        step(1.0, "Listo")
         return entries, data, {"attempts": attempt, "passes": [x for x in log if x["attempt"] == attempt], "log": log}
     detail = "; ".join(p for x in log[-2:] for p in x["problems"][:3])
     raise ReviewError(f"No se pudo entregar un horóscopo limpio tras {MAX_ATTEMPTS} intentos. {detail}")

@@ -24,7 +24,8 @@ from content import (
 PATTERNS = [("A", "B"), ("A", "B", "C")]
 PATTERN_WEIGHTS = [75, 25]
 FALLBACK_PATTERN = PATTERNS[0]
-VARIANT_TRIES = 60
+VARIANT_TRIES = 40
+DRAW_TRIES = 150
 TEXT_TRIES = 40
 
 MONTHS_ES = [
@@ -148,19 +149,32 @@ SLOTS = {
 
 
 class _Cycler:
-    """Reparte las 'cabezas' en ciclos barajados: no repite hasta agotar todas."""
+    """Reparte las 'cabezas' (ideas centrales) sin repetir hasta agotarlas todas.
+
+    take() reserva una cabeza libre; commit() la da por usada (solo cuando el texto se acepta);
+    put_back() libera una reserva de un texto descartado.
+    """
 
     def __init__(self, n, rng):
-        self.n, self.rng, self.queue = n, rng, []
+        self.n, self.rng = n, rng
+        self.avail, self.held = set(range(n)), set()
 
     def take(self):
-        if not self.queue:
-            self.queue = list(range(self.n))
-            self.rng.shuffle(self.queue)
-        return self.queue.pop()
+        cand = sorted(self.avail - self.held)  # el ciclo solo se reinicia en commit(), al agotarse
+        if not cand:
+            return None
+        h = self.rng.choice(cand)
+        self.held.add(h)
+        return h
 
     def put_back(self, head):
-        self.queue.insert(0, head)
+        self.held.discard(head)
+
+    def commit(self, head):
+        self.held.discard(head)
+        self.avail.discard(head)
+        if not self.avail:
+            self.avail = set(range(self.n))
 
 
 def generate_month(year, month, used_sentences=None, seed=None):
@@ -178,20 +192,20 @@ def generate_month(year, month, used_sentences=None, seed=None):
         """Una oración nueva para el slot, o None si no queda ninguna disponible."""
         build, keys = SLOTS[slot]
         cycs = [cyclers.setdefault((slot, k, cat, sign), _Cycler(len(CONTENT[cat][k]), rng)) for k in keys]
-        skipped = []
-        try:
-            for _ in range(max(c.n for c in cycs)):
-                heads = tuple(c.take() for c in cycs)
-                for _ in range(VARIANT_TRIES):
-                    s = build(rng, cat, heads)
-                    if s is not None and s not in used:
-                        return s, cycs, heads
-                skipped.append(heads)
-            return None
-        finally:
-            for heads in skipped:  # cabezas sin variantes libres: se reintentan más adelante
+        for _ in range(DRAW_TRIES):
+            heads = tuple(c.take() for c in cycs)
+            if None in heads:
                 for c, h in zip(cycs, heads):
-                    c.put_back(h)
+                    if h is not None:
+                        c.put_back(h)
+                return None
+            for _ in range(VARIANT_TRIES):
+                s = build(rng, cat, heads)
+                if s is not None and s not in used:
+                    return s, cycs, heads
+            for c, h in zip(cycs, heads):  # combinación sin variantes libres: se prueba otra
+                c.put_back(h)
+        return None
 
     def compose(pattern, cat, sign):
         for _ in range(TEXT_TRIES):
@@ -210,6 +224,9 @@ def generate_month(year, month, used_sentences=None, seed=None):
                 parts.append(s)
                 taken.append((cycs, heads))
             if not _redundant(parts):
+                for cycs, heads in taken:
+                    for c, h in zip(cycs, heads):
+                        c.commit(h)
                 return parts
             release(taken, parts)  # texto redundante: se descarta y se vuelve a armar
         return None
