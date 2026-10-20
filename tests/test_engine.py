@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import sys
 import tempfile
 from collections import Counter
@@ -10,7 +11,7 @@ from openpyxl import load_workbook
 import db
 import exporter
 from content import CATEGORIES, CONTENT, SIGNS
-from engine import generate_month, split_sentences
+from engine import _redundant, generate_month, split_sentences
 
 
 def _sentences(entries):
@@ -30,31 +31,29 @@ def test_no_sentence_repeats_across_months_and_history():
         assert len({e.text for e in es}) == len(es)
 
 
-def test_key_phrase_not_repeated_within_sign_and_month():
-    from content import S1_LEADS, S1_VERBS, S2_FORMS, S3_TIMES
-
-    def role(sent):
-        if any(sent.startswith(t + ",") for t in S3_TIMES):
-            return "s3_comp"
-        if any(sent.startswith(l + ",") for l in S1_LEADS) and any(f" {v} " in sent for v in S1_VERBS):
-            return "s1_comp"
-        if any(f in sent.lower() for f in S2_FORMS):
-            return "s2_effort"
-        return None
-
+def test_key_ideas_not_repeated_within_sign_and_month():
     es = generate_month(2026, 10, set())
     for sign in SIGNS:
         for cat in CATEGORIES:
+            c = CONTENT[cat]
             used = Counter()
             for e in es:
                 if e.sign != sign or e.category != cat:
                     continue
-                for sent in split_sentences(e.text):
-                    key = role(sent)
-                    if key:
-                        used.update(p for p in CONTENT[cat][key] if p in sent and sent.endswith(p + ".") or
-                                    (key == "s2_effort" and p in sent))
+                parts = split_sentences(e.text)
+                used.update(("sit", p) for p in c["sit"] if p in parts[0].lower())
+                used.update(("eff", p) for p in c["eff"] if p in parts[0].lower())
+                used.update(("light", p) for p in c["light"] if p in parts[1].lower())
             assert used and max(used.values()) <= 1, (sign, cat, used.most_common(1))
+
+
+def test_no_redundancy_inside_a_text():
+    es = generate_month(2026, 10, set())
+    for e in es:
+        parts = split_sentences(e.text)
+        assert 2 <= len(parts) <= 3
+        assert not _redundant(parts), e.text
+        assert len(re.findall(r"\bpero\b", e.text.lower())) <= 1, e.text
 
 
 def test_versions_and_delete():

@@ -1,32 +1,49 @@
 """Motor de generación de horóscopos mensuales.
 
-Regla fundamental: NINGUNA oración se repite (ni dentro del mes, ni entre signos,
-ni respecto al historial guardado). Además, la frase clave de cada oración
-(complemento / esfuerzo / objeto) se reparte en ciclo, de modo que tampoco se
-repite dentro del mismo signo y mes. Tono: situación -> esfuerzo -> luz.
+Un pronóstico = A (situación + esfuerzo) + B (luz) + C opcional (astros o consejo).
+
+Reglas:
+  * NINGUNA oración se repite (ni dentro del mes, ni entre signos, ni respecto al historial).
+  * La idea central de cada oración (situación, esfuerzo, resultado, consejo) se reparte en
+    ciclo, de modo que no se repite dentro del mismo signo y categoría en el mes.
+  * Dentro de un mismo texto no se repiten palabras clave entre oraciones (sin redundancias).
+  * Tono: una situación o dificultad, el esfuerzo que pide y, al final, la luz.
 """
 import calendar
 import random
 import re
+import unicodedata
 from dataclasses import dataclass
 from datetime import date
 
 from content import (
-    CATEGORIES, CONTENT, S1_LEADS, S1_VERBS, S2_FORMS, S2_PREFIXES, S2_TAILS,
-    S3_TIMES, S3_VERBS, S4_TAILS, S4_VERBS, SIGN_LEADS, SIGN_PREDICATES,
-    SIGN_SUBJECTS, SIGNS,
+    A_FORMS, A_LEADS, A_TAILS, B_CONNECTORS, B_TAILS, C_FRAMES, C_LEADS,
+    C_PLANETS, C_TIP_FRAMES, C_TIP_LEADS, CATEGORIES, CONTENT, SIGNS,
 )
 
-PATTERNS = [("s1", "s2", "s3"), ("s2", "s3", "s4"), ("s1", "s2", "s3", "s4")]
-PATTERN_WEIGHTS = [4, 2, 3]
+PATTERNS = [("A", "B"), ("A", "B", "C")]
+PATTERN_WEIGHTS = [75, 25]
 FALLBACK_PATTERN = PATTERNS[0]
 VARIANT_TRIES = 60
+TEXT_TRIES = 40
 
 MONTHS_ES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ]
 MONTH_ABBR = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"]
+
+# Palabras de uso común que sí pueden repetirse dentro de un texto.
+_STOP = {
+    "tendr", "habra", "convi", "deber", "tocar", "sera", "neces", "aunqu", "todo", "todas", "todos",
+    "cuand", "menos", "mismo", "porqu", "hacia", "antes", "despu", "sobre", "entre", "desde", "hasta",
+    "puede", "tiene", "tienes", "sient", "quier", "algun", "alguie", "pasar", "estar", "estas", "ahora",
+    "cosas", "lleva", "luego", "donde", "ya que", "cuyo", "tiemp", "momen", "mejor", "ser", "otros",
+    "aquel", "siemp", "nunca", "mucho", "poco", "ratos", "puedes", "hacer", "haces", "hecho", "sigue",
+    "buena", "bueno", "justo", "cada", "tarde", "final", "lo", "algo", "pequen", "grand",
+    "nuevo", "nueva", "viejo", "vieja", "tuyo", "tuya", "tuyos", "tuyas", "dices", "dicen", "estan", "esta",
+    "casi", "tanto", "tanta", "veces", "forma", "manera", "parte", "lugar", "punto", "caso", "frent",
+}
 
 
 @dataclass(frozen=True)
@@ -45,49 +62,88 @@ def split_sentences(text):
     return [s for s in re.split(r"(?<=\.)\s+", text.strip()) if s]
 
 
-def _join(verb, comp):
-    """'da paso a' + 'el X' -> 'da paso al X'."""
-    if verb.endswith(" a") and comp.startswith("el "):
-        return f"{verb[:-2]} al {comp[3:]}"
-    return f"{verb} {comp}"
-
-
 def _cap(s):
     return s[0].upper() + s[1:]
 
 
-# Cada constructor recibe (rng, cat, sign, head) y devuelve una oración candidata.
-def _s1(rng, cat, sign, head):
+def _norm(w):
+    return "".join(c for c in unicodedata.normalize("NFD", w.lower()) if unicodedata.category(c) != "Mn")
+
+
+def _stems(sentence):
+    out = set()
+    for w in re.findall(r"[a-záéíóúüñ]+", sentence.lower()):
+        n = _norm(w)
+        if n in ("dia", "noche", "manana"):  # evita "día ... día" en el mismo texto
+            out.add(n)
+        elif len(n) >= 5:
+            st = n[:5]
+            if st not in _STOP:
+                out.add(st)
+    return out
+
+
+def _redundant(parts):
+    """True si dos oraciones del mismo texto comparten alguna palabra clave (o ambas dicen 'pero')."""
+    if len(re.findall(r"\bpero\b", " ".join(parts).lower())) > 1:
+        return True
+    seen = set()
+    for p in parts:
+        st = _stems(p)
+        if seen & st:
+            return True
+        seen |= st
+    return False
+
+
+# ---- Constructores de oraciones (cada uno recibe rng, categoría y 'cabezas') ----
+def _build_a(rng, cat, heads):
     c = CONTENT[cat]
-    return f"{rng.choice(S1_LEADS)}, {rng.choice(c['s1_subj'])} {_join(rng.choice(S1_VERBS), c['s1_comp'][head])}."
+    sit, eff = c["sit"][heads[0]], c["eff"][heads[1]]
+    form = rng.choice(A_FORMS)
+    tail = rng.choice(A_TAILS) if rng.random() < 0.4 else ""
+    lead = rng.choice(A_LEADS)
+    if _stems(sit) & (_stems(eff) | _stems(tail)):  # sin repetir ideas dentro de la misma oración
+        return None
+    t = rng.randrange(5)
+    if t == 0:
+        s = f"{lead}{sit}, y {form} {eff}{tail}"
+    elif t == 1:
+        s = f"{lead}{sit}; {form} {eff}{tail}"
+    elif t == 2:
+        s = f"{lead}{sit}, pero {form} {eff}{tail}"
+    elif t == 3:
+        s = f"Aunque {sit}, {form} {eff}{tail}"
+    else:
+        s = f"{lead}{sit}: {form} {eff}{tail}"
+    if s.lower().count(" pero ") > 1:
+        return None
+    return _cap(s) + "."
 
 
-def _s2(rng, cat, sign, head):
-    prefix, form, tail = rng.choice(S2_PREFIXES), rng.choice(S2_FORMS), rng.choice(S2_TAILS)
-    if prefix.startswith("Aunque") and "aunque" in tail:
-        tail = ""  # evita "Aunque cueste, ... aunque cueste al principio"
-    return _cap(f"{prefix}{form} {CONTENT[cat]['s2_effort'][head]}{tail}.")
+def _pick_tail(rng, tails, p=0.45):
+    return rng.choice(tails) if rng.random() < p else ""
 
 
-def _s3(rng, cat, sign, head):
-    c = CONTENT[cat]
-    return f"{rng.choice(S3_TIMES)}, {rng.choice(c['s3_subj'])} {_join(rng.choice(S3_VERBS), c['s3_comp'][head])}."
+def _build_b(rng, cat, heads):
+    return _cap(f"{rng.choice(B_CONNECTORS)}{CONTENT[cat]['light'][heads[0]]}{_pick_tail(rng, B_TAILS)}") + "."
 
 
-def _s4_cat(rng, cat, sign, head):
-    return f"{rng.choice(S4_VERBS)} {CONTENT[cat]['s4_obj'][head]}{rng.choice(S4_TAILS)}."
+def _build_astro(rng, cat, heads):
+    planet = rng.choice(C_PLANETS)
+    return _cap(f"{rng.choice(C_LEADS)}{planet} {rng.choice(C_FRAMES)} {CONTENT[cat]['astro'][heads[0]]}") + "."
 
 
-def _s4_sign(rng, cat, sign, head):
-    return f"{rng.choice(SIGN_LEADS)}, {rng.choice(SIGN_SUBJECTS[sign])} {SIGN_PREDICATES[head]}."
+def _build_tip(rng, cat, heads):
+    frame = rng.choice(C_TIP_FRAMES).format(x=CONTENT[cat]["tips"][heads[0]])
+    return _cap(f"{rng.choice(C_TIP_LEADS)}{frame}") + "."
 
 
 SLOTS = {
-    "s1": (_s1, lambda cat, sign: len(CONTENT[cat]["s1_comp"])),
-    "s2": (_s2, lambda cat, sign: len(CONTENT[cat]["s2_effort"])),
-    "s3": (_s3, lambda cat, sign: len(CONTENT[cat]["s3_comp"])),
-    "s4cat": (_s4_cat, lambda cat, sign: len(CONTENT[cat]["s4_obj"])),
-    "s4sign": (_s4_sign, lambda cat, sign: len(SIGN_PREDICATES)),
+    "A": (_build_a, ("sit", "eff")),
+    "B": (_build_b, ("light",)),
+    "Castro": (_build_astro, ("astro",)),
+    "Ctip": (_build_tip, ("tips",)),
 }
 
 
@@ -120,36 +176,50 @@ def generate_month(year, month, used_sentences=None, seed=None):
 
     def draw(slot, cat, sign):
         """Una oración nueva para el slot, o None si no queda ninguna disponible."""
-        build, size = SLOTS[slot]
-        key = (slot, cat, sign)
-        cyc = cyclers.setdefault(key, _Cycler(size(cat, sign), rng))
+        build, keys = SLOTS[slot]
+        cycs = [cyclers.setdefault((slot, k, cat, sign), _Cycler(len(CONTENT[cat][k]), rng)) for k in keys]
         skipped = []
         try:
-            for _ in range(cyc.n):
-                head = cyc.take()
+            for _ in range(max(c.n for c in cycs)):
+                heads = tuple(c.take() for c in cycs)
                 for _ in range(VARIANT_TRIES):
-                    s = build(rng, cat, sign, head)
-                    if s not in used:
-                        return s
-                skipped.append(head)
+                    s = build(rng, cat, heads)
+                    if s is not None and s not in used:
+                        return s, cycs, heads
+                skipped.append(heads)
             return None
         finally:
-            for h in skipped:  # cabezas sin variantes libres: se reintentan más adelante
-                cyc.put_back(h)
+            for heads in skipped:  # cabezas sin variantes libres: se reintentan más adelante
+                for c, h in zip(cycs, heads):
+                    c.put_back(h)
 
     def compose(pattern, cat, sign):
-        parts = []
-        for slot in pattern:
-            if slot == "s4":
-                order = ["s4cat", "s4sign"] if rng.random() < 0.5 else ["s4sign", "s4cat"]
-                s = next((x for x in (draw(o, cat, sign) for o in order) if x), None)
-            else:
-                s = draw(slot, cat, sign)
-            if s is None:
-                return None
-            used.add(s)  # reserva inmediata: evita repetir dentro del mismo texto
-            parts.append(s)
-        return parts
+        for _ in range(TEXT_TRIES):
+            parts, taken = [], []
+            for slot in pattern:
+                if slot == "C":
+                    order = ["Castro", "Ctip"] if rng.random() < 0.5 else ["Ctip", "Castro"]
+                    r = next((x for x in (draw(o, cat, sign) for o in order) if x), None)
+                else:
+                    r = draw(slot, cat, sign)
+                if r is None:
+                    release(taken, parts)
+                    return None
+                s, cycs, heads = r
+                used.add(s)  # reserva inmediata: evita repetir dentro del mismo texto
+                parts.append(s)
+                taken.append((cycs, heads))
+            if not _redundant(parts):
+                return parts
+            release(taken, parts)  # texto redundante: se descarta y se vuelve a armar
+        return None
+
+    def release(taken, parts):
+        """Devuelve las oraciones y las cabezas reservadas por un texto descartado."""
+        used.difference_update(parts)
+        for cycs, heads in reversed(taken):
+            for c, h in zip(cycs, heads):
+                c.put_back(h)
 
     for sign in SIGNS:
         for d in range(1, n_days + 1):

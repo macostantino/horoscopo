@@ -3,8 +3,8 @@
 App para generar el horóscopo de un mes completo: 12 signos × todos los días × 4 categorías
 (Hoy, Amor, Riqueza, Bienestar).
 
-- **Textos únicos**: ningún pronóstico se repite dentro del mes, entre signos, ni con lo ya guardado en la base de datos.
-- **Tono positivo**: cada texto plantea una situación, un esfuerzo/dificultad y cierra con luz.
+- **Sin repetir**: ninguna *oración* se repite dentro del mes, entre signos, ni con lo ya guardado en la base de datos. Dentro de un texto tampoco se repiten ideas ni palabras clave.
+- **Voz de astrólogo**: 2 o 3 oraciones que fluyen como un solo pensamiento (situación, esfuerzo y luz), con influencia de los astros o un consejo ocasional. Tono positivo.
 - **Excel**: mismo formato del archivo de referencia (hoja `HORO`: SIGNO, CATEGORIA, PRONOSTICO, FECHA), nombre `Horoscopo_OCT_2026-V2.xlsx`.
 - **Versiones**: cada generación del mismo mes crea una versión nueva; se pueden eliminar.
 - **Base de datos SQLite** con fecha de creación y tilde de *Publicado* por versión.
@@ -24,5 +24,5 @@ streamlit run app.py
 
 ## Ampliar variedad
 
-Los fragmentos viven en `content.py`. Más frases = más meses sin agotar combinaciones.
+Las piezas de redacción viven en `content.py` (situaciones, esfuerzos, resultados, astros, consejos y conectores). Más piezas = más meses sin agotar combinaciones (hoy ~40 meses de historial).
 Tests: `python -m pytest tests`.
