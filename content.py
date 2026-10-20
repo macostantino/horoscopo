@@ -13,24 +13,25 @@ CATEGORIES = ["Hoy", "Amor", "Riqueza", "Bienestar"]
 
 # ---- Piezas comunes -----------------------------------------------------------
 A_LEADS = [
-    "", "", "Hoy ", "Hoy ", "Este día ", "Durante la jornada ", "Desde temprano ",
-    "Por la mañana ", "Ya desde primera hora ", "A media jornada ",
+    "Hoy ", "Este día ", "Durante la jornada ", "Desde temprano ", "Por la mañana ", "Ya desde primera hora ",
+    "A media jornada ", "En lo que resta del día ", "Durante estas horas ", "Esta mañana ", "Esta tarde ",
+    "En las próximas horas ", "A lo largo del día ", "Con el día recién empezado ",
 ]
 A_FORMS = [
     "tendrás que", "será necesario", "te tocará", "habrá que", "conviene", "deberás",
     "hará falta", "lo mejor será", "vas a tener que", "te conviene",
+    "lo ideal será", "harás bien en", "necesitarás", "es momento de", "toca", "no está de más",
 ]
-A_TAILS = [
-    " antes de seguir adelante", " paso a paso", " con serenidad", " sin prisa pero sin pausa",
-    " aunque cueste al principio", " con la cabeza fría", " sin perder el ánimo", " sin darle más vueltas",
-    " a tu ritmo", " con paciencia", " poniendo todo de tu parte", " sin forzar las cosas", " con buen criterio",
-]
+A_TAILS = [" antes de seguir adelante", " paso a paso", " con serenidad", " aunque cueste al principio"]
 B_CONNECTORS = [
     "Pero ", "Aun así, ", "La buena noticia es que ", "Hacia el final del día ", "Más pronto que tarde ",
     "Poco a poco ", "Si te mantienes firme, ", "Al final ", "Antes de lo que piensas ",
     "Con el correr de las horas ", "Cuando menos lo esperes ", "Tarde o temprano ", "Al caer la tarde ",
     "Lo importante es que ", "Con el tiempo ", "Esa misma noche ", "Sin darte cuenta ",
     "En cuestión de horas ", "Por suerte ", "Con algo de paciencia ", "Para tu sorpresa ", "Y al final ",
+    "Después de todo, ", "Aunque no lo creas, ", "Casi sin esperarlo ", "De un momento a otro ", "A su debido tiempo ",
+    "Si perseveras, ", "Contra todo pronóstico ", "Con un poco de suerte ", "Antes de que te des cuenta ",
+    "Por fortuna, ", "En medio de todo, ", "Con la ayuda del tiempo ",
 ]
 B_TAILS = [
     ", justo cuando más lo necesitas", ", y se nota en tu ánimo", ", y eso te da nuevas fuerzas",
