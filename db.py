@@ -52,6 +52,15 @@ def used_texts(path=None):
         return {r[0] for r in c.execute("SELECT DISTINCT text FROM entries")}
 
 
+def used_sentences(path=None):
+    """Todas las oraciones ya guardadas (historial completo), separadas de cada texto."""
+    from engine import split_sentences
+    out = set()
+    for text in used_texts(path):
+        out.update(split_sentences(text))
+    return out
+
+
 def save_horoscope(year, month, entries, path=None):
     """Guarda una nueva versión del mes y devuelve su id."""
     with connect(path) as c:

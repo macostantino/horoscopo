@@ -67,13 +67,13 @@ with tab_gen:
     go = c3.button("✨ Generar horóscopo", type="primary", width="stretch")
     days = calendar.monthrange(int(year), month)[1]
     st.caption(
-        f"Se generarán {days} días × 12 signos × 4 categorías = {days * 48} pronósticos únicos, "
-        "distintos a todo lo ya guardado. Cada generación crea una nueva versión."
+        f"Se generarán {days} días × 12 signos × 4 categorías = {days * 48} pronósticos únicos; "
+        "ninguna oración se repite con lo ya guardado. Cada generación crea una nueva versión."
     )
     if go:
         try:
             with st.spinner("Escribiendo las estrellas…"):
-                entries = generate_month(int(year), month, db.used_texts())
+                entries = generate_month(int(year), month, db.used_sentences())
                 hid = db.save_horoscope(int(year), month, entries)
             st.session_state["last_id"] = hid
         except ExhaustedError as e:
