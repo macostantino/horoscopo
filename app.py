@@ -8,7 +8,8 @@ import streamlit as st
 
 import db
 from content import CATEGORIES, SIGNS
-from engine import MONTHS_ES, ExhaustedError, generate_month
+from engine import MONTHS_ES, ExhaustedError
+from review import ReviewError, generate_reviewed
 from exporter import build_xlsx, filename
 
 LOGO = Path(__file__).parent / "assets" / "logo.jpg"
@@ -72,16 +73,25 @@ with tab_gen:
     )
     if go:
         try:
-            with st.spinner("Escribiendo las estrellas…"):
-                entries = generate_month(int(year), month, db.used_sentences())
+            with st.spinner("Escribiendo las estrellas y revisándolas dos veces…"):
+                entries, _, report = generate_reviewed(int(year), month, db.used_sentences())
                 hid = db.save_horoscope(int(year), month, entries)
             st.session_state["last_id"] = hid
-        except ExhaustedError as e:
+            st.session_state["report"] = report
+        except (ExhaustedError, ReviewError) as e:
             st.error(str(e))
     hid = st.session_state.get("last_id")
     h = db.get_horoscope(hid) if hid else None
     if h:
         st.success(f"Listo: {fmt(h)} guardado en la base de datos.")
+        rep = st.session_state.get("report")
+        if rep:
+            names = {1: "Revisión 1 · textos generados", 2: "Revisión 2 · Excel final contra el historial"}
+            st.markdown(
+                "\n".join(f"- ✅ **{names[x['pass']]}**: sin problemas" for x in rep["passes"])
+                + (f"\n- 🔁 Se rehízo el mes {rep['attempts'] - 1} vez/veces hasta pasar ambas revisiones."
+                   if rep["attempts"] > 1 else "")
+            )
         st.download_button(
             "⬇️ Descargar Excel", xlsx_for(h["id"]), filename(h["year"], h["month"], h["version"]),
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key="dl_new",

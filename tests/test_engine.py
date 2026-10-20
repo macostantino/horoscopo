@@ -73,3 +73,54 @@ def test_excel_format():
     assert ws.title == "HORO" and ws.max_row == 1489
     assert [c.value for c in ws[1]] == ["SIGNO", "CATEGORIA", "PRONOSTICO", "FECHA"]
     assert ws["A2"].value == "ARIES" and ws["B2"].value == "Hoy"
+
+
+def _rows(entries):
+    return [dict(sign=e.sign, category=e.category, day=e.day.isoformat(), text=e.text) for e in entries]
+
+
+def test_review_passes_clean_month_and_returns_report():
+    from review import generate_reviewed
+    entries, data, rep = generate_reviewed(2026, 11, set(), seed=1)
+    assert len(entries) == 1440 and data and rep["attempts"] >= 1
+    assert [x["pass"] for x in rep["passes"]] == [1, 2] and all(x["count"] == 0 for x in rep["passes"])
+
+
+def test_audit_detects_injected_errors():
+    from review import audit_rows
+    es = generate_month(2026, 11, set(), seed=2)
+    rows = _rows(es)
+    assert audit_rows(rows, 2026, 11) == []
+    # fila faltante
+    assert any("Falta" in p or "Cantidad" in p for p in audit_rows(rows[:-1], 2026, 11))
+    # texto duplicado
+    dup = [dict(r) for r in rows]
+    dup[1]["text"] = dup[0]["text"]
+    assert any("repetid" in p for p in audit_rows(dup, 2026, 11))
+    # oración ya usada en el historial
+    hist = set(split_sentences(rows[0]["text"]))
+    assert any("anteriores" in p for p in audit_rows(rows, 2026, 11, hist))
+    # defecto de formato
+    bad = [dict(r) for r in rows]
+    bad[5]["text"] = bad[5]["text"].replace(" ", "  ", 1)
+    assert any("Formato" in p for p in audit_rows(bad, 2026, 11))
+
+
+def test_review_redoes_month_when_first_attempt_is_defective(monkeypatch):
+    import review
+    from engine import Entry
+    real = review.generate_month
+    calls = []
+
+    def flaky(year, month, history, seed=None):
+        entries = real(year, month, history, seed=seed)
+        calls.append(1)
+        if len(calls) == 1:  # primer intento defectuoso: texto duplicado
+            e0, e1 = entries[0], entries[1]
+            entries[1] = Entry(e1.sign, e1.category, e0.text, e1.day)
+        return entries
+
+    monkeypatch.setattr(review, "generate_month", flaky)
+    entries, data, rep = review.generate_reviewed(2026, 11, set(), seed=3)
+    assert rep["attempts"] == 2 and len(calls) == 2
+    assert rep["log"][0]["count"] > 0 and rep["passes"][-1]["count"] == 0
