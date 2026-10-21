@@ -573,7 +573,7 @@ CONTENT = {
             'revisar tus cuentas sin miedo',
             'hacer una lista de prioridades',
             'leer bien la letra pequeña',
-            'pedir una segunda opinión antes de firmar',
+            'consultar con alguien de confianza antes de firmar',
             'ahorrar aunque sea una pequeña cantidad',
             'agradecer una colaboración',
             'delegar lo que no es esencial',
@@ -841,6 +841,408 @@ CONTENT["Amor"]["astro"] += [
     "las primeras citas",
     "los recuerdos que se reencuentran",
 ]
+for _cat, _lists in CONTENT.items():
+    for _k, _v in _lists.items():
+        assert len(_v) == len(set(_v)), (_cat, _k)
+
+
+# ---- Ampliación de vocabulario (todas las categorías) ----------------------------------------
+def _L(s):
+    return [x.strip() for x in s.strip().split("\n") if x.strip()]
+
+
+_EXT = {
+    "Hoy": {
+        "sit": _L("""
+el reloj parece correr más deprisa que de costumbre
+un cruce de caminos te obliga a elegir rumbo
+te rodea cierta confusión que pide paciencia
+la agenda te exige malabares
+una noticia inesperada sacude tu calendario
+aparece un obstáculo menor justo cuando creías tenerlo todo controlado
+tus pensamientos van y vienen sin encontrar reposo
+hay un asunto espinoso que ya no puedes esquivar
+un compromiso adquirido a la ligera pide cuentas
+sientes el impulso de abandonar una tarea a medias
+una duda ajena intenta colarse en tus planes
+percibes que falta un último empujón para cerrar un tema
+la prisa de los demás amenaza con contagiarte
+una corazonada insiste en llamar tu atención
+"""),
+        "eff": _L("""
+mantener el pulso firme ante lo imprevisto
+deslindar lo urgente de lo accesorio
+enfriar la cabeza antes de contestar
+resistir el impulso de abandonar a medias
+cerrar un frente abierto antes de abrir otro
+hacerte tiempo para lo que de verdad cuenta
+mirar de frente algo que venías eludiendo
+dosificar tu entusiasmo para llegar con fuerzas a la noche
+desconfiar de las soluciones demasiado fáciles
+sostener tu postura sin alzar la voz
+"""),
+        "light": _L("""
+cada pieza encuentra por fin su lugar
+un golpe de suerte te allana el camino
+la intuición te sopla justo la respuesta correcta
+el nudo que te apretaba empieza a aflojarse
+descubres que el esfuerzo tenía sentido
+un rayo de claridad ilumina lo que parecía confuso
+te sorprende la rapidez con que se resuelve un asunto
+alguien dice la palabra exacta y todo cambia
+el cansancio se transforma en satisfacción
+se despeja el horizonte y vuelves a ver el rumbo
+consigues dar el paso que llevabas semanas postergando
+el día te regala un pequeño triunfo
+la balanza se inclina a tu favor
+termina por salir mejor de lo que imaginabas
+"""),
+        "tips": _L("""
+regalarte un respiro a media mañana
+poner en orden tu escritorio antes de empezar
+confiar en tu primera impresión
+dejar un margen para los imprevistos
+hacer una sola cosa a la vez
+escribir tres prioridades al despertar
+brindar por algo pequeño al caer la noche
+desconectar las notificaciones un rato
+"""),
+        "astro": _L("""
+las corazonadas del día
+los asuntos que parecían estancados
+las decisiones rápidas
+los acuerdos de última hora
+las ideas que despiertan al alba
+"""),
+    },
+    "Amor": {
+        "sit": _L("""
+el silencio de alguien querido te intriga
+una declaración pendiente te quema por dentro
+la timidez frena un gesto que deseas hacer
+un reencuentro anunciado te acelera el pulso
+alguien te mira con una ternura que no habías notado
+una promesa hecha hace tiempo pide ser cumplida
+un detalle pequeño te hace dudar de las intenciones ajenas
+la dulzura de un recuerdo te arrulla
+un lazo que creías roto se tensa otra vez
+sientes que el afecto circula mejor entre risas
+"""),
+        "eff": _L("""
+bajar la guardia con quien te quiere
+decir lo que callas con tacto
+reconocer el cariño que ya recibes
+dejar de ensayar discursos y hablar desde el corazón
+contener los celos antes de que crezcan
+poner de tu parte para romper el silencio
+aceptar que el afecto no se exige
+regalar tu atención completa a quien te habla
+"""),
+        "light": _L("""
+una mirada basta para disipar las dudas
+la sinceridad vuelve a tender puentes
+el afecto florece donde menos lo esperabas
+una carta, un mensaje o una visita te llena de dicha
+se derrite el hielo entre dos personas
+la confianza se renueva con un gesto sencillo
+descubres un cariño silencioso que estaba a tu lado
+un abrazo largo repara más de lo que imaginabas
+el cortejo avanza con una dulzura que te desarma
+la risa compartida borra el malestar
+alguien te elige sin dudarlo
+el perdón llega como una brisa fresca
+"""),
+        "tips": _L("""
+escribir una nota cariñosa
+invitar a alguien a un café sin motivo
+abrazar con ganas
+recordar una fecha que importa a alguien
+dar las gracias por un favor antiguo
+dedicar una canción a quien quieres
+"""),
+        "astro": _L("""
+los gestos de ternura
+las confidencias entre dos
+las promesas de afecto
+los lazos que se estrechan
+"""),
+    },
+    "Riqueza": {
+        "sit": _L("""
+una cifra en rojo te quita el sueño
+el reloj de la oficina corre en tu contra
+una oferta tentadora trae letra pequeña
+la competencia te pisa los talones
+te cambian las reglas del juego a mitad de camino
+alguien clave retrasa una respuesta que esperas
+una reunión sin objetivo claro consume tu energía
+se multiplican las llamadas y los correos
+tus gastos fijos hacen su aparición poco amistosa
+te piden un favor profesional que no figura en tu agenda
+una inversión pide más paciencia de la prevista
+recibes una crítica que sientes injusta
+un proyecto en equipo se estanca por falta de acuerdos
+estrenas una responsabilidad que te queda algo grande
+"""),
+        "eff": _L("""
+contar dos veces antes de firmar
+argumentar con datos y no con impulsos
+poner por escrito lo acordado
+afinar el presupuesto de la semana
+agendar tiempo para tus asuntos de dinero
+defender tu valor sin regatearlo
+investigar antes de apostar
+aguantar la presión sin perder la sonrisa
+cortar los gastos hormiga
+aprender de un error ajeno sin criticarlo
+"""),
+        "light": _L("""
+una puerta profesional se entreabre
+tu cuenta respira con un alivio inesperado
+el reconocimiento llega de quien menos esperabas
+se firma un acuerdo con cláusulas a tu favor
+un cliente satisfecho abre otras puertas
+tu propuesta se impone entre las demás
+el mercado te sonríe por un instante
+encuentras una vía de ahorro que no veías
+la perseverancia se transforma en ingresos
+una ventaja competitiva sale a la luz
+tus números muestran una tendencia alentadora
+un aliado inesperado respalda tu idea
+consigues cerrar el mes con un saldo favorable
+el esfuerzo callado recibe su aplauso
+"""),
+        "tips": _L("""
+guardar los comprobantes en orden
+reservar una parte de lo que ganas
+consultar a alguien con experiencia
+negociar con la calma de quien no tiene prisa
+fijar un tope de gastos semanal
+actualizar tu currículum
+agradecer a quien confía en ti
+aprender una herramienta nueva de trabajo
+"""),
+        "astro": _L("""
+los balances y las cuentas
+las ofertas que llegan
+los contratos por firmar
+las alianzas profesionales
+los ingresos extra
+"""),
+    },
+    "Bienestar": {
+        "sit": _L("""
+una molestia leve se instala en la espalda
+el insomnio te visita con insistencia
+añoras un paisaje abierto y un poco de silencio
+el cuerpo reclama sol y movimiento
+una racha de comidas desordenadas empieza a notarse
+los nervios se acumulan en el estómago
+la mente se llena de ventanas abiertas
+un exceso de cafeína te acelera
+te duele la nuca de tanto sostener la tensión
+estás a un paso de tocar tu límite
+la ciudad te pesa y quieres escapar un rato
+un dolor de cabeza amenaza con arruinarte la tarde
+tu energía se agota antes de lo habitual
+notas el cuerpo pesado y el ánimo apagado
+"""),
+        "eff": _L("""
+escuchar la señal del cansancio antes de que grite
+acostarte más temprano por una vez
+hacer pausas visuales lejos de la pantalla
+suavizar la rutina sin abandonarla
+tomar el sol unos minutos
+reducir el café sin dramatizar
+masajear tu cuello con paciencia
+hacer del descanso una prioridad real
+cenar liviano y sin prisa
+respirar contando hasta cuatro
+"""),
+        "light": _L("""
+el cuerpo se afloja como si soltara una cuerda
+tu cabeza se despeja como el cielo después de la lluvia
+descansas profundamente y despiertas con ganas
+el aire nuevo te llena de vitalidad
+un masaje o un estiramiento te renueva
+tu pulso se serena y tu ánimo se aligera
+el sueño regresa como un viejo conocido
+una caminata te devuelve la lucidez
+te reconcilias con tu ritmo natural
+sientes que respiras hasta el fondo
+un baño tibio te devuelve la calma
+la energía vuelve a correr por tus venas
+el dolor cede y reaparece la sonrisa
+un amanecer tranquilo te recibe con alegría
+"""),
+        "tips": _L("""
+tomar un té sin mirar el teléfono
+estirar los hombros cada hora
+salir a ver el cielo un minuto
+ir a la cama sin pantallas
+comer una fruta de temporada
+caminar con calzado cómodo
+cerrar los ojos y contar hasta diez
+regar una planta con calma
+"""),
+        "astro": _L("""
+los ciclos de sueño
+el pulso de tu cuerpo
+los ratos de ocio
+la salud de tu espalda
+las caminatas de la tarde
+"""),
+    },
+}
+for _cat, _d in _EXT.items():
+    for _k, _v in _d.items():
+        CONTENT[_cat][_k] += _v
+for _cat, _lists in CONTENT.items():
+    for _k, _v in _lists.items():
+        assert len(_v) == len(set(_v)), (_cat, _k)
+
+# Piezas comunes ampliadas
+C_PLANETS += ["Urano", "Plutón", "la Luna nueva", "la Luna creciente"]
+C_FRAMES += ["despierta", "ilumina", "armoniza", "acompaña", "alienta", "bendice"]
+C_LEADS += ["Durante estas horas ", "A lo largo del día ", "Con la caída de la tarde "]
+A_LEADS += ["Con la mañana por delante ", "Entre una cosa y otra ", "En la recta final del día "]
+B_CONNECTORS += ["Mucho antes del final ", "Cuando se asiente el polvo ", "Si todo marcha como parece, ", "En el último tramo del día "]
+# Condicionales de una sola oración: "Si logras <esfuerzo>, <luz>."
+COND_LEADS = [
+    "Si logras", "Si te animas a", "Cuando consigas", "Si te decides a", "En cuanto logres",
+    "Una vez que logres", "Si te das permiso para", "Si te propones",
+    "A poco que consigas", "Cuando logres", "Si te atreves a", "Apenas logres", "Tan pronto como logres",
+    "Si decides", "Siempre que logres", "Si pones empeño en", "En el momento en que logres",
+    "Cuando te animes a", "Si consigues", "Si das el paso de", "Si vences la duda y puedes",
+]
+
+
+# ---- Segundo lote de vocabulario ------------------------------------------------------------
+_EXT2 = {
+    "Hoy": {
+        "sit": _L("""
+una racha de indecisión te hace girar en círculos
+el ambiente está cargado de expectativas ajenas
+una tarea rutinaria esconde un detalle delicado
+el entusiasmo inicial se enfría a media mañana
+un plan largamente soñado pide por fin un calendario
+se te acumulan los mensajes por responder
+una charla de pasillo cambia tu manera de ver un asunto
+un hábito viejo intenta ganarte la partida
+"""),
+        "light": _L("""
+el viento cambia de dirección y sopla a tu favor
+la jornada cierra con un aplauso discreto
+un detalle insignificante resulta ser la clave
+la recompensa asoma por la puerta de atrás
+todo vuelve a su cauce con sorprendente facilidad
+alguien inesperado aparece con la solución
+recuperas el hilo y el entusiasmo
+una sonrisa ajena te contagia el buen ánimo
+"""),
+        "eff": _L("""
+dividir el día en pequeños tramos alcanzables
+decidir con la almohada lo que no urge
+separar el ruido de lo esencial
+bajar las expectativas para disfrutar del camino
+rescatar lo útil de una mala idea
+agradecer una ayuda antes de pedir otra
+"""),
+    },
+    "Amor": {
+        "sit": _L("""
+un mensaje sin responder pesa más de lo debido
+la ternura asoma en lo cotidiano, aunque pase inadvertida
+una conversación a medias se queda flotando en el aire
+te intimida la idea de mostrarte vulnerable
+alguien cercano necesita tu oído más que tu consejo
+una broma mal interpretada enfría el ambiente
+las fotos de otros tiempos remueven tu sensibilidad
+hay una invitación a la que no sabes qué responder
+"""),
+        "light": _L("""
+un malentendido se disuelve entre carcajadas
+la mesa compartida se llena de afecto
+se te acerca alguien con la sonrisa que esperabas
+el diálogo fluye como un río manso
+un reproche se convierte en una caricia verbal
+recibes una muestra de cariño en el momento exacto
+se renueva la complicidad con quien camina a tu lado
+un gesto amable abre un capítulo luminoso
+"""),
+        "eff": _L("""
+tomar aire antes de responder a un reproche
+dar crédito a las buenas intenciones
+mirar el lado tierno de una discusión
+dar a cada afecto el tiempo que merece
+decir gracias sin letra pequeña
+transformar un reclamo en una petición clara
+"""),
+    },
+    "Riqueza": {
+        "sit": _L("""
+una factura inesperada altera tu balance mensual
+se acerca la fecha de entrega de un trabajo clave
+alguien con quien trabajas cambia las condiciones pactadas
+las cifras no terminan de cuadrar
+tu ambición choca con una norma rígida
+un cambio de puesto se insinúa en el aire
+te llega una propuesta de negocio poco convencional
+los plazos se estrechan y las dudas se agrandan
+"""),
+        "light": _L("""
+una transferencia o un premio te sonríe
+una cifra clave se corrige a tu favor
+se abre un cupo que parecía agotado
+quien dirige reconoce tu labor
+el balance del mes sorprende gratamente
+alguien valora tu criterio con una oferta concreta
+una colaboración da frutos antes de lo previsto
+tus ahorros crecen con una pequeña sorpresa
+"""),
+        "eff": _L("""
+cuidar la letra chica de cada trato
+cultivar la paciencia del sembrador
+revisar tu ruta de ingresos con lápiz en mano
+evitar prometer plazos imposibles
+dar un paso atrás para ver el mapa completo
+cerrar tratos solo cuando estés conforme
+"""),
+    },
+    "Bienestar": {
+        "sit": _L("""
+las piernas piden caminar y la agenda lo impide
+el estómago te avisa que algo no te cae bien
+una contractura te recuerda que existes
+el ruido del entorno te agota los sentidos
+hay más café que agua en tu rutina
+duermes poco y sueñas demasiado
+un cansancio sordo se esconde tras tu sonrisa
+tu postura delata las horas frente a la pantalla
+"""),
+        "light": _L("""
+el agua fresca te devuelve la claridad
+el cuerpo agradece el descanso con una ráfaga de energía
+el sol de la tarde te abraza
+una infusión caliente cierra el día con dulzura
+tu espalda se relaja y la tensión se disipa
+el silencio te regala un instante de paz profunda
+una carcajada libera lo que la tensión guardaba
+la ligereza vuelve a tus pasos
+"""),
+        "eff": _L("""
+hidratarte aunque no tengas sed
+estirar la espalda sin apuro
+cerrar los ojos un minuto cada tarde
+salir a que te dé el aire antes de decidir
+caminar de forma consciente unos minutos
+respetar tu horario de sueño aunque tengas planes
+"""),
+    },
+}
+for _cat, _d in _EXT2.items():
+    for _k, _v in _d.items():
+        CONTENT[_cat][_k] += _v
 for _cat, _lists in CONTENT.items():
     for _k, _v in _lists.items():
         assert len(_v) == len(set(_v)), (_cat, _k)

@@ -56,7 +56,7 @@ def audit_rows(rows, year, month, history=()):
             continue
         if "  " in t or "{" in t or "}" in t or "None" in t or t != t.strip():
             problems.append(f"Formato defectuoso en {where}")
-        if not 2 <= len(parts) <= 3:
+        if not 1 <= len(parts) <= 3:
             problems.append(f"{len(parts)} oraciones en {where}")
         if any(not p[0].isupper() or not p.endswith(".") for p in parts):
             problems.append(f"Oración sin mayúscula inicial o sin punto final en {where}")
@@ -83,11 +83,10 @@ def audit_rows(rows, year, month, history=()):
         c = CONTENT[cat]
         cnt = Counter()
         for parts in texts_:
-            if len(parts) < 2:
-                continue
-            cnt.update(("situación", p) for p in c["sit"] if p in parts[0].lower())
-            cnt.update(("esfuerzo", p) for p in c["eff"] if p in parts[0].lower())
-            cnt.update(("resultado", p) for p in c["light"] if p in parts[1].lower())
+            low = " ".join(parts).lower()
+            cnt.update(("situación", p) for p in c["sit"] if p in low)
+            cnt.update(("esfuerzo", p) for p in c["eff"] if p in low)
+            cnt.update(("resultado", p) for p in c["light"] if p in low)
         for (kind, phrase), n in cnt.items():
             if n > 1:
                 problems.append(f"{kind.capitalize()} repetida {n} veces en {sign}/{cat}: «{phrase}»")

@@ -17,12 +17,18 @@ from dataclasses import dataclass
 from datetime import date
 
 from content import (
-    A_FORMS, A_LEADS, A_TAILS, B_CONNECTORS, B_TAILS, C_FRAMES, C_LEADS,
+    A_FORMS, A_LEADS, A_TAILS, B_CONNECTORS, B_TAILS, C_FRAMES, C_LEADS, COND_LEADS,
     C_PLANETS, C_TIP_FRAMES, C_TIP_LEADS, CATEGORIES, CONTENT, SIGNS,
 )
 
-PATTERNS = [("A", "B"), ("A", "B", "C")]
-PATTERN_WEIGHTS = [88, 12]
+# Estructuras de texto (la luz siempre queda al final):
+#   A+B            situación + esfuerzo, luego la luz
+#   A+B+C          lo anterior + una oración de astros o consejo
+#   COND           una sola oración: "Si logras <esfuerzo>, <luz>."
+#   S+COND         la situación en una oración y el condicional en otra
+#   COND+C         condicional seguido de astros o consejo
+PATTERNS = [("A", "B"), ("A", "B", "C"), ("COND",), ("S", "COND"), ("COND", "C")]
+PATTERN_WEIGHTS = [50, 8, 18, 16, 8]
 FALLBACK_PATTERN = PATTERNS[0]
 VARIANT_TRIES = 40
 SHORT_A = 0.4  # fracción de primeras oraciones que van directo al consejo
@@ -141,6 +147,21 @@ def _build_b(rng, cat, heads):
     return _cap(f"{conn}{light}{tail}") + "."
 
 
+def _build_cond(rng, cat, heads):
+    c = CONTENT[cat]
+    eff, light = c["eff"][heads[0]], c["light"][heads[1]]
+    lead = rng.choice(COND_LEADS)
+    if _stems(eff) & _stems(light) or _stems(lead) & _stems(eff):  # sin repetir ideas en la misma oración
+        return None
+    tail = _pick_tail(rng, B_TAILS, 0.15)
+    return _cap(f"{lead} {eff}, {light}{tail}") + "."
+
+
+def _build_sit(rng, cat, heads):
+    lead = rng.choice(A_LEADS) if rng.random() < 0.4 else ""
+    return _cap(f"{lead}{CONTENT[cat]['sit'][heads[0]]}") + "."
+
+
 def _build_astro(rng, cat, heads):
     planet = rng.choice(C_PLANETS)
     return _cap(f"{rng.choice(C_LEADS)}{planet} {rng.choice(C_FRAMES)} {CONTENT[cat]['astro'][heads[0]]}") + "."
@@ -154,6 +175,8 @@ def _build_tip(rng, cat, heads):
 SLOTS = {
     "A": (_build_a, ("sit", "eff")),
     "B": (_build_b, ("light",)),
+    "COND": (_build_cond, ("eff", "light")),
+    "S": (_build_sit, ("sit",)),
     "Castro": (_build_astro, ("astro",)),
     "Ctip": (_build_tip, ("tips",)),
 }
@@ -202,7 +225,7 @@ def generate_month(year, month, used_sentences=None, seed=None):
     def draw(slot, cat, sign):
         """Una oración nueva para el slot, o None si no queda ninguna disponible."""
         build, keys = SLOTS[slot]
-        cycs = [cyclers.setdefault((slot, k, cat, sign), _Cycler(len(CONTENT[cat][k]), rng)) for k in keys]
+        cycs = [cyclers.setdefault((k, cat, sign), _Cycler(len(CONTENT[cat][k]), rng)) for k in keys]
         for _ in range(DRAW_TRIES):
             heads = tuple(c.take() for c in cycs)
             if None in heads:

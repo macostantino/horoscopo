@@ -40,10 +40,10 @@ def test_key_ideas_not_repeated_within_sign_and_month():
             for e in es:
                 if e.sign != sign or e.category != cat:
                     continue
-                parts = split_sentences(e.text)
-                used.update(("sit", p) for p in c["sit"] if p in parts[0].lower())
-                used.update(("eff", p) for p in c["eff"] if p in parts[0].lower())
-                used.update(("light", p) for p in c["light"] if p in parts[1].lower())
+                low = e.text.lower()
+                used.update(("sit", p) for p in c["sit"] if p in low)
+                used.update(("eff", p) for p in c["eff"] if p in low)
+                used.update(("light", p) for p in c["light"] if p in low)
             assert used and max(used.values()) <= 1, (sign, cat, used.most_common(1))
 
 
@@ -51,7 +51,7 @@ def test_no_redundancy_inside_a_text():
     es = generate_month(2026, 10, set())
     for e in es:
         parts = split_sentences(e.text)
-        assert 2 <= len(parts) <= 3
+        assert 1 <= len(parts) <= 3
         assert not _redundant(parts), e.text
         assert len(re.findall(r"\bpero\b", e.text.lower())) <= 1, e.text
 
