@@ -22,9 +22,10 @@ from content import (
 )
 
 PATTERNS = [("A", "B"), ("A", "B", "C")]
-PATTERN_WEIGHTS = [75, 25]
+PATTERN_WEIGHTS = [88, 12]
 FALLBACK_PATTERN = PATTERNS[0]
 VARIANT_TRIES = 40
+SHORT_A = 0.4  # fracción de primeras oraciones que van directo al consejo
 DRAW_TRIES = 150
 TEXT_TRIES = 40
 
@@ -102,13 +103,15 @@ def _build_a(rng, cat, heads):
     c = CONTENT[cat]
     sit, eff = c["sit"][heads[0]], c["eff"][heads[1]]
     form = rng.choice(A_FORMS)
-    tail = rng.choice(A_TAILS) if rng.random() < 0.15 else ""
+    tail = rng.choice(A_TAILS) if rng.random() < 0.10 else ""
     if tail.startswith(" aunque") and "aunque" in eff:
         tail = ""
-    lead = rng.choice(A_LEADS) if rng.random() < 0.5 else ""
+    lead = rng.choice(A_LEADS) if rng.random() < 0.3 else ""
+    if rng.random() < SHORT_A:  # consejo directo, sin la situación previa (textos más breves)
+        return _cap(f"{lead}{form} {eff}{tail}") + "."
     if _stems(sit) & (_stems(eff) | _stems(tail)):  # sin repetir ideas dentro de la misma oración
         return None
-    t = rng.randrange(5)
+    t = rng.choices(range(5), weights=[4, 4, 4, 1, 3])[0]
     if t == 0:
         s = f"{lead}{sit}, y {form} {eff}{tail}"
     elif t == 1:
@@ -124,7 +127,7 @@ def _build_a(rng, cat, heads):
     return _cap(s) + "."
 
 
-def _pick_tail(rng, tails, p=0.35):
+def _pick_tail(rng, tails, p=0.2):
     return rng.choice(tails) if rng.random() < p else ""
 
 

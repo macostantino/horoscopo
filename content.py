@@ -785,3 +785,62 @@ CONTENT = {
         ],
     },
 }
+
+
+# ---- Ampliación de Amor: amistades, familia, citas y nostalgia (no solo pareja) ----------
+CONTENT["Amor"]["sit"] += [
+    "una amistad de años te pide un momento de calidad",
+    "una cita o un encuentro social te llena de expectativas",
+    "tu familia reclama un poco más de tu presencia",
+    "te acuerdas de alguien con mucha nostalgia",
+    "alguien de tu círculo de amistades atraviesa un mal momento",
+    "una reunión familiar despierta emociones encontradas",
+    "te invitan a una salida que te hace dudar",
+    "un viejo conocido reaparece en tu vida",
+    "alguien de tu familia espera noticias tuyas",
+    "sientes que tu círculo de amistades necesita renovarse",
+    "un recuerdo de la infancia te llena de ternura",
+    "te cuesta decidir si das una segunda oportunidad",
+    "una persona nueva despierta tu interés, aunque no sepas por qué",
+]
+CONTENT["Amor"]["light"] += [
+    "alguien querido te sorprende con una llamada",
+    "la familia se reúne y todo se siente más liviano",
+    "una cita inesperada te devuelve la ilusión",
+    "una amistad se fortalece con una charla sincera",
+    "la nostalgia se convierte en una sonrisa",
+    "un lazo familiar se estrecha y te llena de calidez",
+    "alguien nuevo en tu vida te transmite confianza",
+    "recuperas el contacto con alguien que extrañabas",
+    "un brindis con los tuyos deja un recuerdo hermoso",
+    "una segunda oportunidad resulta mejor de lo esperado",
+    "descubres quiénes están de verdad a tu lado",
+    "una salida con amistades te recarga de alegría",
+]
+CONTENT["Amor"]["eff"] += [
+    "dedicar tiempo a una amistad que lo necesita",
+    "llamar a alguien de tu familia",
+    "aceptar una invitación que te da pereza",
+    "dejar atrás una nostalgia que pesa",
+    "dar una segunda oportunidad con la cabeza fría",
+    "soltar una amistad que ya no suma",
+    "tomar la iniciativa en una cita",
+    "reservar un rato para tu círculo cercano",
+]
+CONTENT["Amor"]["tips"] += [
+    "organizar una reunión con tus amistades",
+    "llamar a tus padres o a tus hermanos",
+    "aceptar esa invitación pendiente",
+    "mirar fotos que te hagan sonreír",
+    "escribirle a alguien con quien perdiste contacto",
+    "preparar una cena para los tuyos",
+]
+CONTENT["Amor"]["astro"] += [
+    "las amistades de toda la vida",
+    "las reuniones familiares",
+    "las primeras citas",
+    "los recuerdos que se reencuentran",
+]
+for _cat, _lists in CONTENT.items():
+    for _k, _v in _lists.items():
+        assert len(_v) == len(set(_v)), (_cat, _k)
